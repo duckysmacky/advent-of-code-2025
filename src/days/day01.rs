@@ -16,6 +16,7 @@ impl DaySolution for Solution {
     input.into_iter()
       .fold(50, |dial, line| {
         let dial = turn_dial(dial, &line);
+        let dial = normalize_dial(dial);
         if dial == 0 { password += 1; }
         dial
       });
@@ -24,31 +25,40 @@ impl DaySolution for Solution {
   }
 
   fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
-    
+
 
     Ok(0)
   }
 }
 
 fn turn_dial(dial: i64, rotation: &str) -> i64 {
-    let side = rotation.chars().nth(0).unwrap();
-    let amount = rotation[1..].parse::<i64>().unwrap();
+  let mut chars = rotation.chars();
+  let side = chars.next().unwrap();
+  let amount = chars.as_str().parse::<i64>().unwrap();
 
-    let dial = match side {
-        'L' => dial - amount,
-        'R' => dial + amount,
-        _ => 0,
-    } as i64;
+  let dial = match side {
+    'L' => dial - amount,
+    'R' => dial + amount,
+    _ => 0,
+  } as i64;
 
-    normalize_dial(dial)
+  dial
 }
 
 fn normalize_dial(dial: i64) -> i64 {
-    if dial < 0 {
-        normalize_dial(99 + dial + 1)
-    } else if dial > 99 {
-        normalize_dial(dial - 99 - 1)
-    } else {
-        dial as i64
-    }
+  if dial > 99 {
+    dial % 100
+  } else if dial < 0 {
+    dial.rem_euclid(100)
+  } else {
+    dial
+  }
 }
+
+// 99 + 5 = 104 -> 4
+// 3 - 7 = -4 -> 96
+//
+//
+//
+//
+//
