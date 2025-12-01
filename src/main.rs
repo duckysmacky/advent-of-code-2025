@@ -19,7 +19,7 @@ fn main() {
     None
   };
 
-  if day < 1 || day > 25 {
+  if day < 1 || day > 12 {
     eprintln!("Error: Invalid day specified");
     process::exit(1);
   }
