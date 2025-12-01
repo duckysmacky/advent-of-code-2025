@@ -15,9 +15,18 @@ impl DaySolution for Solution {
 
     input.into_iter()
       .fold(50, |dial, line| {
-        let dial = turn_dial(dial, &line);
-        let dial = normalize_dial(dial);
-        if dial == 0 { password += 1; }
+        let mut dial = turn_dial(dial, &line);
+
+        if dial > 99 {
+          dial = dial % 100;
+        } else if dial < 0 {
+          dial = dial.rem_euclid(100);
+        }
+
+        if dial == 0 {
+          password += 1;
+        }
+
         dial
       });
 
@@ -44,21 +53,3 @@ fn turn_dial(dial: i64, rotation: &str) -> i64 {
 
   dial
 }
-
-fn normalize_dial(dial: i64) -> i64 {
-  if dial > 99 {
-    dial % 100
-  } else if dial < 0 {
-    dial.rem_euclid(100)
-  } else {
-    dial
-  }
-}
-
-// 99 + 5 = 104 -> 4
-// 3 - 7 = -4 -> 96
-//
-//
-//
-//
-//
