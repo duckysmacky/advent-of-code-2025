@@ -2,6 +2,7 @@ use std::{fmt::{Debug, Display}, time::Instant};
 use crate::util;
 
 mod day01;
+mod day02;
 
 /// A generic trait which defines an solution for any one of the days.
 /// This was added simply to reduce the boilerplate and code repetition
@@ -59,6 +60,7 @@ pub fn run_day(day: u8, part: Option<u8>) -> Result<(), String> {
 
   match day {
     1 => day01::Solution::default().run(part),
+    2 => day02::Solution::default().run(part),
     _ => Err(format!("Day #{} solution not yet implemented", day))
   }
 }
