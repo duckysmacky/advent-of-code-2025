@@ -11,15 +11,11 @@ impl DaySolution for Solution {
     }
 
     fn part1(&self, input: Vec<String>) -> Result<Self::Output, String> {
-        let map = input.into_iter()
-            .map(|line| line.chars().collect())
-            .collect::<Vec<Vec<char>>>();
-
         let mut count = 0;
 
-        for row in 0..map.len() {
-            for col in 0..map[row].len() {
-                if map[row][col] == '@' && count_rolls(&map, row, col) < 4 {
+        for row in 0..input.len() {
+            for col in 0..input[row].len() {
+                if input[row].as_bytes()[col] == b'@' && count_rolls(&input, row, col) < 4 {
                     count += 1;
                 }
             }
@@ -33,11 +29,11 @@ impl DaySolution for Solution {
     }
 }
 
-fn check_bounds(map: &Vec<Vec<char>>, row: i32, col: i32) -> bool {
+fn check_bounds(map: &Vec<String>, row: i32, col: i32) -> bool {
     row >= 0 && row < map.len() as i32 && col >= 0 && col < map[row as usize].len() as i32
 }
 
-fn count_rolls(map: &Vec<Vec<char>>, row: usize, col: usize) -> u64 {
+fn count_rolls(map: &Vec<String>, row: usize, col: usize) -> u64 {
     let mut count = 0;
 
     let moves: [(i8, i8); 8] = [(-1, -1), (-1, 0), (-1, 1),
@@ -48,10 +44,15 @@ fn count_rolls(map: &Vec<Vec<char>>, row: usize, col: usize) -> u64 {
         let row = row as i32 + moves[move_i].0 as i32;
         let col = col as i32 + moves[move_i].1 as i32;
 
-        if check_bounds(map, row, col) && map[row as usize][col as usize] == '@' {
+        if check_bounds(map, row, col) && map[row as usize].as_bytes()[col as usize] == b'@' {
             count += 1;
         }
     }
 
     count
+}
+
+fn test() {
+    let at_symbol = b'@';
+    println!("{}", at_symbol);
 }
