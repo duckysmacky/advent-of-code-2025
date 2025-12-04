@@ -30,9 +30,9 @@ trait DaySolution : Default {
   /// Will also measure how much time it took to run
   fn run_part(&self, part: u8) -> Result<(), String> {
     println!("[i] Running part #{}", part);
-    let start = Instant::now();
 
     let input = util::read_input(self.day_number(), part)?;
+    let start = Instant::now();
 
     let result = match part {
       1 => self.part1(input),
@@ -41,8 +41,10 @@ trait DaySolution : Default {
     }?;
 
     let duration = start.elapsed();
+    let total_ms = duration.as_secs_f64() * 1000f64;
+
     println!("[a] Part #{} answer: {}", part, result);
-    println!("[i] Took {}ms to run", duration.as_millis());
+    println!("[i] Took {:.3}ms to run", total_ms);
     Ok(())
   }
 
