@@ -13,7 +13,7 @@ impl DaySolution for Solution {
     fn part1(&self, input: Vec<String>) -> Result<Self::Output, String> {
         let mut input_iter = input.into_iter();
 
-        let fresh_ranges = input_iter.by_ref()
+        let ranges = input_iter.by_ref()
             .take_while(|line| !line.is_empty())
             .map(|line| {
                 let mut parts = line.split('-');
@@ -23,12 +23,11 @@ impl DaySolution for Solution {
             })
             .collect::<Vec<_>>();
 
+        let ranges = merge_ranges(ranges);
+
         let fresh_ids = input_iter
             .map(|line| line.parse::<u64>().unwrap())
-            .filter(|id| {
-                fresh_ranges.iter()
-                    .any(|&(start, end)| start <= *id && *id <= end)
-            })
+            .filter(|id| is_in_ranges(&ranges, *id))
             .count();
 
         Ok(fresh_ids)
@@ -37,4 +36,44 @@ impl DaySolution for Solution {
     fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
         Ok(0)
     }
+}
+
+fn merge_ranges(mut ranges: Vec<(u64, u64)>) -> Vec<(u64, u64)> {
+    ranges.sort_by_key(|&(start, _)| start);
+
+    let mut merged = Vec::new();
+    let mut current = ranges[0];
+
+    ranges.into_iter()
+        .skip(1)
+        .for_each(|range| {
+            if range.0 <= current.1 + 1 {
+                current.1 = current.1.max(range.1);
+            } else {
+                merged.push(current);
+                current = range;
+            }
+        });
+
+    merged.push(current);
+    merged
+}
+
+fn is_in_ranges(ranges: &[(u64, u64)], id: u64) -> bool {
+    let mut left = 0;
+    let mut right = ranges.len();
+
+    while left < right {
+        let mid = left + (right - left) / 2;
+        let (start, end) = ranges[mid];
+
+        if id < start {
+            right = mid;
+        } else if id > end {
+            left = mid + 1;
+        } else {
+            return true;
+        }
+    }
+    false
 }
