@@ -11,14 +11,10 @@ impl DaySolution for Solution {
     }
 
     fn part1(&self, input: Vec<String>) -> Result<Self::Output, String> {
-        let blank_line_i = input.iter()
-            .position(|line| line.is_empty())
-            .unwrap();
+        let mut input_iter = input.into_iter();
 
-        let (input_ranges, input_ids) = input.split_at(blank_line_i);
-        let input_ids = &input_ids[1..];
-
-        let fresh_ranges = input_ranges.into_iter()
+        let fresh_ranges = input_iter.by_ref()
+            .take_while(|line| !line.is_empty())
             .map(|line| {
                 let mut parts = line.split('-');
                 let start = parts.next().unwrap().parse::<u64>().unwrap();
@@ -27,18 +23,15 @@ impl DaySolution for Solution {
             })
             .collect::<Vec<_>>();
 
-        let fresh_ids = input_ids.into_iter()
+        let fresh_ids = input_iter
             .map(|line| line.parse::<u64>().unwrap())
             .filter(|id| {
                 fresh_ranges.iter()
                     .any(|&(start, end)| start <= *id && *id <= end)
             })
-            .collect::<Vec<_>>();
+            .count();
 
-        // println!("{:?}", fresh_ranges);
-        // println!("{:?}", fresh_ids);
-
-        Ok(fresh_ids.len())
+        Ok(fresh_ids)
     }
 
     fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
