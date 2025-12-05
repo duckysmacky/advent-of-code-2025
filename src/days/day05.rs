@@ -34,7 +34,21 @@ impl DaySolution for Solution {
     }
 
     fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
-        Ok(0)
+        let ranges = input.into_iter()
+            .take_while(|line| !line.is_empty())
+            .map(|line| {
+                let mut parts = line.split('-');
+                let start = parts.next().unwrap().parse::<u64>().unwrap();
+                let end = parts.next().unwrap().parse::<u64>().unwrap();
+                (start, end)
+            })
+            .collect::<Vec<_>>();
+
+        let ranges_count = merge_ranges(ranges).into_iter()
+            .map(|(start, end)| end - start + 1)
+            .sum::<u64>();
+
+        Ok(ranges_count as usize)
     }
 }
 
