@@ -25,7 +25,25 @@ impl DaySolution for Solution {
     }
 
     fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
-        Ok(0)
+        let mut input = input;
+        let mut count = 0;
+
+        let mut any_removed = true;
+        while any_removed {
+            any_removed = false;
+
+            for row in 0..input.len() {
+                for col in 0..input[row].len() {
+                    if input[row].as_bytes()[col] == b'@' && count_rolls(&input, row, col) < 4 {
+                        input[row].replace_range(col..=col, "x");
+                        count += 1;
+                        any_removed = true;
+                    }
+                }
+            }
+        }
+
+        Ok(count)
     }
 }
 
@@ -50,9 +68,4 @@ fn count_rolls(map: &Vec<String>, row: usize, col: usize) -> u64 {
     }
 
     count
-}
-
-fn test() {
-    let at_symbol = b'@';
-    println!("{}", at_symbol);
 }
