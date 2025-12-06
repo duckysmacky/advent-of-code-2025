@@ -13,16 +13,17 @@ fn main() {
   }
 
   let day = args[1].parse::<u8>().unwrap_or(0);
-  let part = if args.len() > 2 {
-    Some(args[2].parse::<u8>().unwrap_or(0))
-  } else {
-    None
-  };
 
   if day < 1 || day > 12 {
     eprintln!("Error: Invalid day specified");
     process::exit(1);
   }
+
+  let part = if args.len() > 2 {
+    Some(args[2].parse::<u8>().unwrap_or(0))
+  } else {
+    None
+  };
 
   if let Some(part) = part {
     if ![1, 2].contains(&part) {
@@ -31,12 +32,18 @@ fn main() {
     }
   }
 
-  if let Err(err) = days::run_day(day, part) {
+  let test = if args.len() > 3 {
+    args[3] == "test"
+  } else {
+    false
+  };
+
+  if let Err(err) = days::run_day(day, part, test) {
     eprintln!("Error running day #{}: {}", day, err);
     process::exit(1);
   }
 }
 
 fn print_usage() {
-  println!("Usage: aoc2025 <day> [part]");
+  println!("Usage: aoc2025 <day> [part] [test]");
 }
