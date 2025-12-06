@@ -34,9 +34,24 @@ impl DaySolution for Solution {
   }
 
   fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
+    let mut password = 0;
 
+    input.into_iter()
+      .fold(50, |dial, line| {
+        let mut dial = turn_dial(dial, &line);
 
-    Ok(0)
+        if dial > 99 {
+          password += dial / 100;
+          dial = dial % 100;
+        } else if dial < 0 {
+          password += (dial / 100).abs() + 1;
+          dial = dial.rem_euclid(100);
+        }
+
+        dial
+      });
+
+    Ok(password)
   }
 }
 
