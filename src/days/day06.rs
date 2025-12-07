@@ -47,7 +47,7 @@ impl DaySolution for Solution {
         Ok(result)
     }
 
-    fn part2(&self, input: Vec<String>) -> Result<Self::Output, String> {
+    fn part2(&self, _input: Vec<String>) -> Result<Self::Output, String> {
         Ok(0)
     }
 }
