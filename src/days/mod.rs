@@ -9,6 +9,7 @@ mod day05;
 mod day06;
 mod day07;
 mod day08;
+mod day09;
 
 /// A generic trait which defines an solution for any one of the days.
 /// This was added simply to reduce the boilerplate and code repetition
@@ -75,6 +76,7 @@ pub fn run_day(day: u8, part: Option<u8>, test: bool) -> Result<(), String> {
     6 => day06::Solution::default().run(part, test),
     7 => day07::Solution::default().run(part, test),
     8 => day08::Solution::default().run(part, test),
+    9 => day09::Solution::default().run(part, test),
     _ => Err(format!("Day #{} solution not yet implemented", day))
   }
 }
