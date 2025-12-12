@@ -3,13 +3,13 @@ use std::cmp::{Ordering, min, max};
 
 use crate::days::DaySolution;
 
-/// Wrapper struct for f32 that implements Ord and Eq traits so I can use it in a BinaryHeap
+/// Wrapper struct for f64 that implements Ord and Eq traits so I can use it in a BinaryHeap
 #[derive(Debug, PartialEq, PartialOrd)]
-struct OrderedF32(f32);
+struct Orderedf64(f64);
 
-impl Eq for OrderedF32 {}
+impl Eq for Orderedf64 {}
 
-impl Ord for OrderedF32 {
+impl Ord for Orderedf64 {
     fn cmp(&self, other: &Self) -> Ordering {
         self.0.total_cmp(&other.0)
     }
@@ -19,86 +19,72 @@ impl Ord for OrderedF32 {
 pub struct Solution {}
 
 impl DaySolution for Solution {
-    type Output = usize;
+    type Output = u64;
 
     fn day_number(&self) -> u8 {
         8
     }
 
     fn part1(&self, input: Vec<String>) -> Result<Self::Output, String> {
-        let points = input.into_iter()
-            .map(|line| {
-                let mut coordinates = [0u32; 3];
-
-                line.split(',')
-                    .map(|x| x.parse::<u32>().unwrap())
-                    .enumerate()
-                    .for_each(|(i, x)| coordinates[i] = x);
-
-                coordinates
-            })
-            .collect::<Vec<_>>();
-
+        let mut points: Vec<[u64; 3]> = Vec::new();
         let mut calculated_indexes: HashSet<(usize, usize)> = HashSet::new();
         let mut connections = BinaryHeap::new();
 
-        for origin_i in 0..points.len() {
-            println!("{} - {:?}", origin_i, points[origin_i]);
-            let origin_point = &points[origin_i];
+        input.into_iter()
+            .enumerate()
+            .for_each(|(i, line)| {
+                let mut point = [0u64; 3];
 
-            for other_i in 0..points.len() {
-                let other_point = &points[other_i];
-                let dist = distance(origin_point, other_point);
-                let indexes = (min(origin_i, other_i), max(origin_i, other_i));
+                line.split(',')
+                    .map(|x| x.parse::<u64>().unwrap())
+                    .enumerate()
+                    .for_each(|(i, x)| point[i] = x);
 
-                if dist != 0.0 && !calculated_indexes.contains(&indexes) {
-                    connections.push((OrderedF32(-dist), origin_i, other_i));
-                    calculated_indexes.insert(indexes);
-                }
-            }
-        }
+                points.iter()
+                    .enumerate()
+                    .for_each(|(other_i, other_point)| {
+                        let dist = distance(&point, other_point);
+                        let indexes = (min(i, other_i), max(i, other_i));
 
-        let mut connection_graph: HashMap<usize, HashSet<usize>> = HashMap::new();
+                        if dist != 0.0 && !calculated_indexes.contains(&indexes) {
+                            connections.push((Orderedf64(dist), i, other_i));
+                            calculated_indexes.insert(indexes);
+                        }
+                    });
 
-        let best_connections = connections.into_iter()
-            .take(10)
-            .collect::<Vec<_>>();
+                points.push(point)
+            });
 
-        for (_, origin_i, other_i) in best_connections {
-            println!("Connecting {} and {}", origin_i, other_i);
+        let mut connection_graph: HashMap<usize, Vec<usize>> = HashMap::new();
 
-            connection_graph.entry(origin_i)
-                .or_default()
-                .insert(other_i);
+        connections.into_sorted_vec().into_iter()
+            .take(1000)
+            .for_each(|(_, origin_i, other_i)| {
+                connection_graph.entry(origin_i)
+                    .or_default()
+                    .push(other_i);
 
-            connection_graph.entry(other_i)
-                .or_default()
-                .insert(origin_i);
-        }
-
-        eprintln!("Connections:");
-        for (i, points) in &connection_graph {
-            println!("{}: {:?}", i, points);
-        }
+                connection_graph.entry(other_i)
+                    .or_default()
+                    .push(origin_i);
+            });
 
         let mut visited = HashSet::new();
         let mut sizes = BinaryHeap::new();
 
         for &start_node in connection_graph.keys() {
             if !visited.contains(&start_node) {
-                println!("Start node: {}", start_node);
                 let count = dfs_count(&connection_graph, &mut visited, start_node);
                 sizes.push(count);
             }
         }
 
-        println!("Sizes: {:?}", sizes);
-
-        let answer = sizes.into_iter()
+        let answer = sizes.into_sorted_vec().iter()
+            .rev()
             .take(3)
-            .fold(1, |total, x| total * x);
+            .product::<u64>();
 
-        Ok(answer as usize)
+        Ok(answer)
     }
 
     fn part2(&self, _input: Vec<String>) -> Result<Self::Output, String> {
@@ -106,19 +92,17 @@ impl DaySolution for Solution {
     }
 }
 
-fn distance(p: &[u32], q: &[u32]) -> f32 {
+fn distance(p: &[u64], q: &[u64]) -> f64 {
     ((0..3).into_iter()
-        .map(|i| (p[i] as i32 - q[i] as i32).pow(2))
-        .sum::<i32>() as f32)
+        .map(|i| (p[i] as i64 - q[i] as i64).pow(2))
+        .sum::<i64>() as f64)
         .sqrt()
 }
 
-fn dfs_count(graph: &HashMap<usize, HashSet<usize>>, visited: &mut HashSet<usize>, node: usize) -> u32 {
+fn dfs_count(graph: &HashMap<usize, Vec<usize>>, visited: &mut HashSet<usize>, node: usize) -> u64 {
     if !visited.insert(node) {
         return 0;
     }
-
-    println!("Visiting node: {}", node);
 
     let mut count = 0;
 
